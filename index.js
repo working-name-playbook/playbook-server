@@ -11,7 +11,7 @@ server.get("/hello", (req, res) => {
 
 server.get("/goodbye", (req, res) => {
     console.log(req);
-    res.end("Goodbyte, cruel world.");
+    res.send("Goodbyte, cruel world.");
 });
 
 server.listen(8080);
