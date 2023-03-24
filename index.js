@@ -8,27 +8,10 @@ let server = express();
 // Declare global file name
 var temporaryFileName = '';
 
-// Function to retrieve parameters from a URL
-var retrieveUrlParameter = function retrieveUrlParameter(parameterIdentifier) {
-    var pageURL = window.location.search.substring(1),
-        variablesFromURL = pageURL.split('&'),
-        parameterFullyQualified,
-        i;
-
-    for (i = 0; i < variablesFromURL.length; i++) {
-        parameterFullyQualified = variablesFromURL[i].split('=');
-
-        if (parameterFullyQualified[0] === parameterIdentifier) {
-            return parameterFullyQualified[1] === undefined ? true : decodeURIComponent(parameterFullyQualified[1]); // ask Luman about this line
-        }
-    }
-    return false;
-};
-
 // Hello!
-server.get("/hello", (req, res) => {
+server.get("/hello", (request, result) => {
     console.log("SOMEONE SHOWED UP!");
-    res.send("Hello, world!");
+    result.send("Hello, world!");
     const characters = 'abcdefghijklmnopqrstuvwxyz';
     temporaryFileName = '';
     for (i = 0; i <= 10; i++) {
@@ -36,15 +19,32 @@ server.get("/hello", (req, res) => {
         var randomLetter = characters[randomLetterIndex];
         temporaryFileName += randomLetter;
     }
-    var fileContents = retrieveUrlParameter('contents');
-    fs.mkdir("tempDir");
-    fs.writeFile("tempDir/"+temporaryFileName, fileContents);
+    var fileContents = request.query.contents;
+    fs.mkdir('tempdir', (err) => {
+        if (err) {
+            return console.error(err);
+        }
+        console.log("Directory 'tempdir' created successfully!");
+    });
+    fs.writeFile('tempDir/'+temporaryFileName, fileContents, (err) => {
+        if (err) {
+            return console.error(err);
+        }
+        console.log("File '"+temporaryFileName+"' created successfully!")
+    });
+    console.log(request);
 });
 
 // Goodbye!
-server.get("/goodbye", (req, res) => {
-    console.log(req);
-    res.send("Goodbyte, cruel world.");
+server.get("/goodbye", (request, result) => {
+    console.log(request);
+    result.send("Goodbyte, cruel world.");
+    fs.unlink('tempDir/'+temporaryFileName, (err) => {
+        if (err) {
+            return console.error(err);
+        }
+        console.log("File '"+temporaryFileName+"' deleted successfuly!")
+    })
 });
 
 // Localhost port
