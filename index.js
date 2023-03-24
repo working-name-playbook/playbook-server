@@ -19,7 +19,7 @@ server.get("/hello", (request, result) => {
         var randomLetter = characters[randomLetterIndex];
         temporaryFileName += randomLetter;
     }
-    var fileContents = request.query.contents;
+    var fileContents = request.query.contents; // this is how (we dooooo iiittt) we retrieve request query params
     fs.mkdir('tempdir', (err) => {
         if (err) {
             return console.error(err);
