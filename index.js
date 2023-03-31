@@ -7,7 +7,6 @@ const axios = require('axios');
 let server = express();
 
 server.use(express.json());
-fileShuttle.init();
 
 // Declare global file name
 var temporaryFileName = '';
@@ -25,13 +24,13 @@ var fileShuttle = {
             if (err) {
                 return console.error(err);
             }
-            console.log("Directory '"+problemID+"' created successfully!")
+            console.log("Directory '"+problemID+"' created successfully!");
         });
         fs.writeFile(problemID+'/'+temporaryFileName, codeText, (err) => {
             if (err) {
                 return console.error(err);
             }
-            console.log("File '"+temporaryFileName+"' created successfully!")
+            console.log("File '"+temporaryFileName+"' created successfully!");
         });
     }
 }
@@ -58,7 +57,7 @@ server.get("/hello", (request, result) => {
         if (err) {
             return console.error(err);
         }
-        console.log("File '"+temporaryFileName+"' created successfully!")
+        console.log("File '"+temporaryFileName+"' created successfully!");
     });
     console.log(request);
 });
@@ -71,14 +70,14 @@ server.get("/goodbye", (request, result) => {
         if (err) {
             return console.error(err);
         }
-        console.log("File '"+temporaryFileName+"' deleted successfuly!")
+        console.log("File '"+temporaryFileName+"' deleted successfuly!");
     })
 });
 
 // Handling a post request
 server.post("/hello", (request, result) => {
-    console.log(request.body.data)
-    result.send("Your post request was successfully received! Huzzah!")
+    console.log(request.body.data);
+    result.send("Your post request was successfully received! Huzzah!");
 })
 
 // Localhost port
