@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>FORM TESTING</title>
+        <link href="index.css" rel="stylesheet">
+    </head>
+    <body>
+        <main>
+            <div id = "formDiv">
+                <form id = "formForm" onsubmit = fileShuttle.sendCodePacket(this, "problem1")>
+                    <div>
+                        <label for = "sendForm" id = "formLabel">ENTER INFORMATION INTO THIS FORM, YEAH?</label>
+                        <textarea id = "sendForm"></textarea>
+                    </div>
+                    <div>
+                        <button type = "submit" id = "sendBtn">SUBMIT FORM</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+        <!-- Uses <script> element to import the client.js file -->
+        <script src="index.js" type="text/javascript"></script>
+    </body>
+</html>

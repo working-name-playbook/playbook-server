@@ -11,6 +11,30 @@ server.use(express.json());
 // Declare global file name
 var temporaryFileName = '';
 
+var fileShuttle = {
+    sendCodePacket: (codeText, problemID) => {
+        const characters = 'abcdefghijklmnopqrstuvwxyz';
+        temporaryFileName = '';
+        for (i = 0; i <= 10; i++) {
+            var randomLetterIndex = Math.floor(Math.random() * characters.length);
+            var randomLetter = characters[randomLetterIndex];
+            temporaryFileName += randomLetter;
+        };
+        fs.mkdir(problemID, (err) => {
+            if (err) {
+                return console.error(err);
+            }
+            console.log("Directory '"+problemID+"' created successfully!")
+        });
+        fs.writeFile(problemID+'/'+temporaryFileName, codeText, (err) => {
+            if (err) {
+                return console.error(err);
+            }
+            console.log("File '"+temporaryFileName+"' created successfully!")
+        });
+    }
+}
+
 // Hello!
 server.get("/hello", (request, result) => {
     console.log("SOMEONE SHOWED UP!");
@@ -22,7 +46,7 @@ server.get("/hello", (request, result) => {
         var randomLetter = characters[randomLetterIndex];
         temporaryFileName += randomLetter;
     }
-    var fileContents = request.query.contents; // this is how (we dooooo iiittt) we retrieve request query params
+    var fileContents = request.query.contents; // this is how we (dooooo iiittt) retrieve request query params
     fs.mkdir('tempdir', (err) => {
         if (err) {
             return console.error(err);
@@ -50,6 +74,7 @@ server.get("/goodbye", (request, result) => {
     })
 });
 
+// Handling a post request
 server.post("/hello", (request, result) => {
     console.log(request.body.data)
     result.send("Your post request was successfully received! Huzzah!")
