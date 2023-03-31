@@ -76,7 +76,7 @@ server.get("/goodbye", (request, result) => {
 
 // Handling a post request
 server.post("/hello", (request, result) => {
-    console.log(request.body.data);
+    console.log(request);
     result.send("Your post request was successfully received! Huzzah!");
 })
 
