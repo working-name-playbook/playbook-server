@@ -7,6 +7,7 @@ const axios = require('axios');
 let server = express();
 
 server.use(express.json());
+fileShuttle.init();
 
 // Declare global file name
 var temporaryFileName = '';
