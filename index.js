@@ -1,8 +1,9 @@
 // Import required libraries
 const express = require('express');
-const fs = require('fs');
+const fs = require('fs-extra');
 const axios = require('axios');
 const cors = require('cors');
+const Docker = require('dockerode');
 
 // Create server
 let server = express();
@@ -16,31 +17,7 @@ let corsOptions = {
 server.use(cors(corsOptions));
 
 // Declare global file name
-var temporaryFileName = '';
-
-var fileShuttle = {
-    sendCodePacket: (codeText, problemID) => {
-        const characters = 'abcdefghijklmnopqrstuvwxyz';
-        temporaryFileName = '';
-        for (i = 0; i <= 10; i++) {
-            var randomLetterIndex = Math.floor(Math.random() * characters.length);
-            var randomLetter = characters[randomLetterIndex];
-            temporaryFileName += randomLetter;
-        };
-        fs.mkdir(problemID, (err) => {
-            if (err) {
-                return console.error(err);
-            }
-            console.log("Directory '"+problemID+"' created successfully!");
-        });
-        fs.writeFile(problemID+'/'+temporaryFileName, codeText, (err) => {
-            if (err) {
-                return console.error(err);
-            }
-            console.log("File '"+temporaryFileName+"' created successfully!");
-        });
-    }
-}
+var randomName = '';
 
 // Goodbye!
 server.get("/goodbye", (request, result) => {
@@ -55,31 +32,59 @@ server.get("/goodbye", (request, result) => {
 });
 
 // Handling a post request
-server.post("/hello", (request, result) => {
+server.post("/playbook", (request, result) => {
     console.log(request.body);
+    // Creating directory/file name for temporary problem storage
+    var problemID = request.body["problemID"];
     result.send("Your post request was successfully received! Huzzah!");
     const characters = 'abcdefghijklmnopqrstuvwxyz';
-    temporaryFileName = '';
+    randomName = '';
     for (i = 0; i <= 10; i++) {
         var randomLetterIndex = Math.floor(Math.random() * characters.length);
         var randomLetter = characters[randomLetterIndex];
-        temporaryFileName += randomLetter;
+        randomName += randomLetter;
     }
     var fileContents = request.body["payload"];
-    fs.mkdir('tempdir', (err) => {
+    // Create temporary problem directory
+    fs.mkdir(randomName, (err) => {
         if (err) {
             return console.error(err);
         }
-        console.log("Directory 'tempdir' created successfully!");
+        console.log("Directory "+randomName+" created successfully!");
+    
+        // Copy the relevant activity folder into problem directory
+        fs.copy('activities/'+problemID+'/', randomName+'/', function (err) {
+            if (err) return console.error(err)
+            console.log('success!')
+
+            // Write student-written code to empty src folder in problem directory
+            fs.writeFile(randomName+'/src/main.rs', fileContents, (err) => {
+                if (err) {
+                    return console.error(err);
+                }
+                console.log("File '"+randomName+"' created successfully!");
+
+                // COMMENCE THE WHALE SERENADING
+                // Instantiate dockerode
+                var docker = new Docker({socketPath: '\\.\pipe\docker_engine:/var/run/docker.sock'});
+
+                // Create a Docker container
+                docker.createContainer({Image: 'rustbucket', Cmd: ['/bin/bash'], name: 'rustbucket'}, function (err, container) {
+                    if (err) {
+                        return console.error(err);
+                    };
+                    container.start(function (err, data) {
+                        if (err) {
+                            return console.error(err);
+                        };
+                    });
+                });
+            });
+        });
     });
-    fs.writeFile('tempdir/'+temporaryFileName, fileContents, (err) => {
-        if (err) {
-            return console.error(err);
-        }
-        console.log("File '"+temporaryFileName+"' created successfully!");
-    });
-    console.log(request)
 })
 
+
 // Localhost port
-server.listen(8080); // why is this 8080 and *not* 5000?
+server.listen(8080);
+
