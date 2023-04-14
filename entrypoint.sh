@@ -1,4 +1,3 @@
 
-cd rustbucket
-cd docker-test
+cd user-container-dir
 cargo run #--release

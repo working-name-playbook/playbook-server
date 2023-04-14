@@ -66,18 +66,17 @@ server.post("/playbook", (request, result) => {
 
                 // COMMENCE THE WHALE SERENADING
                 // Instantiate dockerode
-                var docker = new Docker({socketPath: '\\.\pipe\docker_engine:/var/run/docker.sock'});
+                var docker = new Docker({socketPath: '//./pipe/docker_engine'});
 
-                // Create a Docker container
-                docker.createContainer({Image: 'rustbucket', Cmd: ['/bin/bash'], name: 'rustbucket'}, function (err, container) {
+                docker.run(
+                    'rustbucket',
+                    [],
+                    undefined,
+                    {"Host Config": {"Binds": [`${randomName}:/user-container-dir/`]}
+                }, (err, data, container) => {
                     if (err) {
                         return console.error(err);
                     };
-                    container.start(function (err, data) {
-                        if (err) {
-                            return console.error(err);
-                        };
-                    });
                 });
             });
         });
