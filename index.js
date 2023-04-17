@@ -65,14 +65,14 @@ server.post("/playbook", (request, result) => {
                 console.log("File '"+randomName+"' created successfully!");
 
                 // COMMENCE THE WHALE SERENADING
-                // Instantiate dockerode
+                // Instantiate dockerode w/ Windows-specific socket path
                 var docker = new Docker({socketPath: '//./pipe/docker_engine'});
 
                 docker.run(
                     'rustbucket',
                     [],
                     undefined,
-                    {"Host Config": {"Binds": [`${randomName}:/user-container-dir/`]}
+                    {"HostConfig": {"Binds": [`${randomName}:/user-container-dir`]}
                 }, (err, data, container) => {
                     if (err) {
                         return console.error(err);
