@@ -17,10 +17,9 @@ let corsOptions = {
 server.use(cors(corsOptions));
 
 // Declare global file name
-var randomName = '';
 var docker = new Docker({socketPath: '//./pipe/docker_engine'});
 
-const launchContainer = async (folderName) => {
+const launchContainer = (folderName) => {
     // COMMENCE THE WHALE SERENADING
     // Instantiate dockerode w/ Windows-specific socket path
     console.log("Dockerode instantiated...")
@@ -28,12 +27,23 @@ const launchContainer = async (folderName) => {
         'rustbucket',
         [],
         undefined,
-        {"HostConfig": {"Binds": [`./${folderName}/:/user-container-dir`]}
+        {"HostConfig": {"Binds": [`${process.cwd()}/${folderName}:/user-container-dir`]}
     }, (err, data, container) => {
         if (err) {
             return console.error(err);
         };
     });
+}
+
+const folderHash = () => {
+    let randomName = "";
+    const characters = 'abcdefghijklmnopqrstuvwxyz';
+    for (i = 0; i <= 10; i++) {
+        var randomLetterIndex = Math.floor(Math.random() * characters.length);
+        var randomLetter = characters[randomLetterIndex];
+        randomName += randomLetter;
+    }
+    return randomName;
 }
 
 // Goodbye!
@@ -49,21 +59,15 @@ server.get("/goodbye", (request, result) => {
 });
 
 // Handling a post request
-server.post("/playbook", async (request, result) => {
+server.post("/playbook", (request, result) => {
     console.log(request.body);
     // Creating directory/file name for temporary problem storage
-    var problemID = request.body["problemID"];
+    var problemID = request.body.problemID;
     result.send("Your post request was successfully received! Huzzah!");
-    const characters = 'abcdefghijklmnopqrstuvwxyz';
-    randomName = '';
-    for (i = 0; i <= 10; i++) {
-        var randomLetterIndex = Math.floor(Math.random() * characters.length);
-        var randomLetter = characters[randomLetterIndex];
-        randomName += randomLetter;
-    }
-    var fileContents = request.body["payload"];
+    var fileContents = request.body.payload;
     // Create temporary problem directory
-    let mkdir = fs.mkdir(randomName, async (err) => {
+    let randomName = folderHash();
+    fs.mkdir(randomName, async (err) => {
         if (err) {
             return console.error(err);
         }
@@ -73,16 +77,16 @@ server.post("/playbook", async (request, result) => {
         fs.copy('activities/'+problemID+'/', randomName+'/', async (err) => {
             if (err) return console.error(err)
             console.log('success!')
-
             // Write student-written code to empty src folder in problem directory
             fs.writeFile(randomName+'/src/main.rs', fileContents, (err) => {
                 if (err) {
                     return console.error(err);
                 }
                 console.log("File '"+randomName+"' created successfully!");
-
+                fs.readdir(randomName, (err, files) => {
+                    if(files) launchContainer(randomName); 
+                });
             });
-            await launchContainer(randomName); 
         });
     });
 })
