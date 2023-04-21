@@ -1,6 +1,6 @@
 
-echo "Waiting for 20s..."
-sleep 20s
+echo "Waiting for 10s..."
+sleep 10s
 echo "Done waiting!"
 echo "ls"
 ls

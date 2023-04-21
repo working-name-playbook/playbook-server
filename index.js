@@ -18,6 +18,23 @@ server.use(cors(corsOptions));
 
 // Declare global file name
 var randomName = '';
+var docker = new Docker({socketPath: '//./pipe/docker_engine'});
+
+const launchContainer = async (folderName) => {
+    // COMMENCE THE WHALE SERENADING
+    // Instantiate dockerode w/ Windows-specific socket path
+    console.log("Dockerode instantiated...")
+    docker.run(
+        'rustbucket',
+        [],
+        undefined,
+        {"HostConfig": {"Binds": [`./${folderName}/:/user-container-dir`]}
+    }, (err, data, container) => {
+        if (err) {
+            return console.error(err);
+        };
+    });
+}
 
 // Goodbye!
 server.get("/goodbye", (request, result) => {
@@ -32,7 +49,7 @@ server.get("/goodbye", (request, result) => {
 });
 
 // Handling a post request
-server.post("/playbook", (request, result) => {
+server.post("/playbook", async (request, result) => {
     console.log(request.body);
     // Creating directory/file name for temporary problem storage
     var problemID = request.body["problemID"];
@@ -46,14 +63,14 @@ server.post("/playbook", (request, result) => {
     }
     var fileContents = request.body["payload"];
     // Create temporary problem directory
-    fs.mkdir(randomName, (err) => {
+    let mkdir = fs.mkdir(randomName, async (err) => {
         if (err) {
             return console.error(err);
         }
         console.log("Directory "+randomName+" created successfully!");
     
         // Copy the relevant activity folder into problem directory
-        fs.copy('activities/'+problemID+'/', randomName+'/', function (err) {
+        fs.copy('activities/'+problemID+'/', randomName+'/', async (err) => {
             if (err) return console.error(err)
             console.log('success!')
 
@@ -64,21 +81,8 @@ server.post("/playbook", (request, result) => {
                 }
                 console.log("File '"+randomName+"' created successfully!");
 
-                // COMMENCE THE WHALE SERENADING
-                // Instantiate dockerode w/ Windows-specific socket path
-                var docker = new Docker({socketPath: '//./pipe/docker_engine'});
-
-                docker.run(
-                    'rustbucket',
-                    [],
-                    undefined,
-                    {"HostConfig": {"Binds": [`${randomName}:/user-container-dir`]}
-                }, (err, data, container) => {
-                    if (err) {
-                        return console.error(err);
-                    };
-                });
             });
+            await launchContainer(randomName); 
         });
     });
 })
