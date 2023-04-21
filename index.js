@@ -38,9 +38,9 @@ const launchContainer = (folderName) => {
 const folderHash = () => {
     let randomName = "";
     const characters = 'abcdefghijklmnopqrstuvwxyz';
-    for (i = 0; i <= 10; i++) {
-        var randomLetterIndex = Math.floor(Math.random() * characters.length);
-        var randomLetter = characters[randomLetterIndex];
+    for (let i = 0; i <= 10; i++) {
+        let randomLetterIndex = Math.floor(Math.random() * characters.length);
+        let randomLetter = characters[randomLetterIndex];
         randomName += randomLetter;
     }
     return randomName;
@@ -62,28 +62,25 @@ server.get("/goodbye", (request, result) => {
 server.post("/playbook", (request, result) => {
     console.log(request.body);
     // Creating directory/file name for temporary problem storage
-    var problemID = request.body.problemID;
+    let problemID = request.body.problemID;
     result.send("Your post request was successfully received! Huzzah!");
-    var fileContents = request.body.payload;
+    let fileContents = request.body.payload;
     // Create temporary problem directory
     let randomName = folderHash();
     fs.mkdir(randomName, async (err) => {
-        if (err) {
-            return console.error(err);
-        }
+        if (err) return console.error(err);
         console.log("Directory "+randomName+" created successfully!");
-    
         // Copy the relevant activity folder into problem directory
         fs.copy('activities/'+problemID+'/', randomName+'/', async (err) => {
             if (err) return console.error(err)
             console.log('success!')
             // Write student-written code to empty src folder in problem directory
             fs.writeFile(randomName+'/src/main.rs', fileContents, (err) => {
-                if (err) {
-                    return console.error(err);
-                }
+                if (err) return console.error(err);
                 console.log("File '"+randomName+"' created successfully!");
+                // Read the directory
                 fs.readdir(randomName, (err, files) => {
+                    // If files exist in the newly-created folder
                     if(files) launchContainer(randomName); 
                 });
             });
@@ -94,4 +91,3 @@ server.post("/playbook", (request, result) => {
 
 // Localhost port
 server.listen(8080);
-
