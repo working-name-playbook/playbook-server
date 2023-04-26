@@ -22,10 +22,10 @@ var docker = new Docker({socketPath: '//./pipe/docker_engine'});
 const launchContainer = (folderName) => {
     // COMMENCE THE WHALE SERENADING
     // Instantiate dockerode w/ Windows-specific socket path
-    console.log("Dockerode instantiated...")
+    //console.log("Dockerode instantiated...")
     docker.run(
         'rustbucket',
-        [],
+        ['--network none'],
         undefined,
         {"HostConfig": {"Binds": [`${process.cwd()}/${folderName}:/user-container-dir`]}
     }, (err, data, container) => {
@@ -48,7 +48,7 @@ const folderHash = () => {
 
 // Goodbye!
 server.get("/goodbye", (request, result) => {
-    console.log(request);
+    //console.log(request);
     result.send("Goodbyte, cruel world.");
     fs.unlink('tempdir/'+temporaryFileName, (err) => {
         if (err) {
@@ -60,7 +60,7 @@ server.get("/goodbye", (request, result) => {
 
 // Handling a post request
 server.post("/playbook", (request, result) => {
-    console.log(request.body);
+    //console.log(request.body);
     // Creating directory/file name for temporary problem storage
     let problemID = request.body.problemID;
     result.send("Your post request was successfully received! Huzzah!");
@@ -73,7 +73,7 @@ server.post("/playbook", (request, result) => {
         // Copy the relevant activity folder into problem directory
         fs.copy('activities/'+problemID+'/', randomName+'/', async (err) => {
             if (err) return console.error(err)
-            console.log('success!')
+            //console.log('success!')
             // Write student-written code to empty src folder in problem directory
             fs.writeFile(randomName+'/src/main.rs', fileContents, (err) => {
                 if (err) return console.error(err);
