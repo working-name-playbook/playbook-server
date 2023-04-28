@@ -25,9 +25,10 @@ const launchContainer = (folderName) => {
     //console.log("Dockerode instantiated...")
     docker.run(
         'rustbucket',
-        ['--network none'],
-        undefined,
-        {"HostConfig": {"Binds": [`${process.cwd()}/${folderName}:/user-container-dir`]}
+        [],
+        undefined, {
+            "NetworkDisabled": true,
+            "HostConfig": {"Binds": [`${process.cwd()}/${folderName}:/user-container-dir`]}
     }, (err, data, container) => {
         if (err) {
             return console.error(err);
