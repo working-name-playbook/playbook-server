@@ -4,6 +4,7 @@ const fs = require('fs-extra');
 const axios = require('axios');
 const cors = require('cors');
 const Docker = require('dockerode');
+const stream = require('stream');
 
 // Create server
 let server = express();
