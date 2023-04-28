@@ -4,6 +4,7 @@ const fs = require('fs-extra');
 const axios = require('axios');
 const cors = require('cors');
 const Docker = require('dockerode');
+const stream = require('stream');
 
 // Create server
 let server = express();
@@ -33,6 +34,13 @@ const launchContainer = (folderName) => {
         if (err) {
             return console.error(err);
         };
+        container.logs({
+            follow: true,
+            stdout: true,
+            stderr: true
+        }, (err, stream) => {
+            console.log(stream);
+        });
     });
 }
 
