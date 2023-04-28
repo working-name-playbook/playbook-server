@@ -1,10 +1,8 @@
 // Import required libraries
 const express = require('express');
 const fs = require('fs-extra');
-const axios = require('axios');
 const cors = require('cors');
 const Docker = require('dockerode');
-const stream = require('stream');
 
 // Create server
 let server = express();
@@ -34,10 +32,6 @@ const launchContainer = (folderName) => {
         if (err) {
             return console.error(err);
         };
-        let logStream = new stream.PassThrough();
-        logStream.on('data', (chunk) => {
-            console.log(chunk.toString('utf-8'));
-        });
         container.logs({
             follow: 0,
             stdout: 1,
