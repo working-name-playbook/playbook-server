@@ -33,6 +33,13 @@ const launchContainer = (folderName) => {
         if (err) {
             return console.error(err);
         };
+        container.logs({
+            follow: true,
+            stdout: true,
+            stderr: true
+        }, (err, stream) => {
+            console.log(stream);
+        });
     });
 }
 
