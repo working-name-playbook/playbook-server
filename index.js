@@ -1,10 +1,8 @@
 // Import required libraries
 const express = require('express');
 const fs = require('fs-extra');
-const axios = require('axios');
 const cors = require('cors');
 const Docker = require('dockerode');
-//const stream = require('stream');
 
 // Create server
 let server = express();
@@ -34,13 +32,15 @@ const launchContainer = (folderName) => {
         if (err) {
             return console.error(err);
         };
-        /*container.logs({
-            follow: true,
-            stdout: true,
-            stderr: true
-        }, (err, stream) => {
-            console.log(stream);
-        });*/
+        container.logs({
+            follow: 0,
+            stdout: 1,
+            stderr: 1
+        }, (err, data) => {
+            let log = Buffer.from(data);
+            // TODO: Write this to a file
+            console.log(log.toString());
+        });
     });
 }
 
