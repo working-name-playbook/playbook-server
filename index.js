@@ -37,9 +37,12 @@ const launchContainer = (folderName) => {
             stdout: 1,
             stderr: 1
         }, (err, data) => {
-            let log = Buffer.from(data);
-            // TODO: Write this to a file
-            console.log(log.toString());
+            let dockerLog = Buffer.from(data);
+            console.log(dockerLog.toString());
+            fs.writeFile(folderName+'/output.txt', dockerLog.toString(), (err) => {
+                if (err) return console.error(err);
+                console.log("Above output successfully written to "+folderName+"!");
+            });
         });
     });
 }
