@@ -75,7 +75,7 @@ server.post("/playbook", (request, result) => {
     //console.log(request.body);
     // Creating directory/file name for temporary problem storage
     let problemID = request.body.problemID;
-    result.send("Your post request was successfully received! Huzzah!");
+    //result.send("Your post request was successfully received! Huzzah!");
     let fileContents = request.body.payload;
     // Create temporary problem directory
     let randomName = folderHash();
@@ -93,11 +93,17 @@ server.post("/playbook", (request, result) => {
                 // Read the directory
                 fs.readdir(randomName, (err, files) => {
                     // If files exist in the newly-created folder
-                    if(files) launchContainer(randomName); 
+                    if(files) launchContainer(randomName);
+                    // Return output folder name and associated problemID
+                    result.send(JSON.stringify({activity: problemID, folder: randomName}))
                 });
             });
         });
     });
+});
+
+server.post("/dbquery", (request, result) => {
+    result.send("THIS IS A DB REQUEST PLACEHOLDER");
 })
 
 
